@@ -4,28 +4,31 @@
 
 **a. Initial design**
 
-The PawPal+ system is designed to help a pet owner manage daily pet care tasks efficiently. The system focuses on three core user actions:
+The PawPal+ system is designed using four main classes: Owner, Pet, Task, and Scheduler.
 
-1. Add and manage pets
-2. Add and manage tasks for each pet (such as walks, feeding, medications)
-3. Generate a daily schedule based on task priority and time
+- **Owner**: Represents the user and stores multiple pets. It acts as the central point to retrieve all tasks across pets.
+- **Pet**: Represents an individual pet and maintains a list of tasks associated with that pet.
+- **Task**: Represents a single activity such as feeding, walking, or medication. It includes attributes like duration, priority, time, and completion status.
+- **Scheduler**: Responsible for organizing tasks and generating a daily plan. It will handle sorting, prioritization, and conflict detection.
 
-To support this, I designed the system using four main classes:
-
-- **Owner**: Represents the user and stores multiple pets. It acts as the central access point for retrieving all tasks across pets.
-- **Pet**: Represents an individual pet and stores its associated tasks.
-- **Task**: Represents a single activity with attributes such as duration, priority, and scheduled time.
-- **Scheduler**: Responsible for organizing tasks, generating the daily plan, and later handling sorting and conflict detection.
-
-This design follows object-oriented principles by separating responsibilities clearly across classes.
+This design separates responsibilities clearly. Each class has a single role, which makes the system modular and easier to extend later.
 
 **b. Design changes**
 
+**b. Design changes**
 
-At this stage, the design is kept simple to avoid over-engineering. I focused only on the core entities required for the system. 
+After reviewing the initial design, I ensured that the Scheduler class is responsible only for planning logic and does not store any task data directly. Instead, it retrieves tasks from the Owner, which aggregates tasks from all pets.
 
-I may refine the Scheduler later to include more advanced logic such as conflict detection, filtering, and recurring tasks once the base system is working.
+This separation avoids tight coupling between classes and keeps the system flexible and scalable. It ensures that changes to pets or tasks do not require modifications to the scheduling logic.
 
+I also refined the data flow so that all task retrieval happens through the Owner class. This creates a single source of truth and prevents inconsistencies when accessing tasks across multiple pets.
+
+Additionally, I confirmed that relationships are properly defined:
+- Owner contains multiple pets
+- Each pet contains multiple tasks
+- Scheduler interacts with Owner to access all tasks
+
+No major structural changes were needed, but this review helped validate that the design is clean, maintainable, and ready for future extensions such as filtering, recurring tasks, and conflict detection.
 ---
 
 ## 2. Scheduling Logic and Tradeoffs
