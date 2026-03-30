@@ -138,4 +138,3 @@ class Scheduler:
 
         return warnings
 
-
