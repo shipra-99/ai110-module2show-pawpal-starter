@@ -53,6 +53,30 @@ The PawPal+ scheduler includes several algorithmic improvements:
 
 These features improve usability while keeping the implementation simple and readable.
 
+## Testing PawPal+
+
+To run the automated test suite:
+
+```bash
+python -m pytest
+```
+What is tested
+
+The test suite verifies the core functionality of the PawPal+ system:
+
+Task Completion: Ensures tasks are correctly marked as completed.
+Task Addition: Confirms tasks are properly added to a pet.
+Sorting: Verifies that tasks are ordered chronologically by time.
+Filtering: Ensures completed tasks are excluded from the active schedule.
+Recurring Tasks: Confirms that completing a recurring task generates a new task.
+Conflict Detection: Detects and reports tasks scheduled at the same time.
+
+
+Confidence Level ⭐⭐⭐⭐☆ (4/5)
+
+The system performs reliably across all tested scenarios, including edge cases like empty task lists and scheduling conflicts. While the implementation is intentionally simple (e.g., conflict detection only checks exact time matches), it is stable and meets all project requirements.
+
+
 ## System Design (UML)
 
 ```mermaid

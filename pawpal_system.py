@@ -55,28 +55,29 @@ class Owner:
 
 
 # ---------------- SCHEDULER ----------------
+
 class Scheduler:
     def __init__(self, owner: Owner):
         self.owner = owner
+
     def generate_daily_plan(self):
+        """Generate a sorted daily plan of tasks."""
         tasks = self.owner.get_all_tasks()
 
-        # handle recurrence
+        # handle recurrence (temporary, no mutation)
         new_tasks = self.handle_recurring_tasks(tasks)
-
-        # combine original + new tasks (temporary, not stored)
         tasks = tasks + new_tasks
 
-        # filter incomplete
+        # filter incomplete tasks
         tasks = self.filter_tasks(tasks, completed=False)
 
-        # sort
+        # sort by time
         tasks = self.sort_by_time(tasks)
 
         return tasks
 
     def sort_by_time(self, tasks: List[Task]):
-        """Sort tasks by time in HH:MM format."""
+        """Sort tasks by time (HH:MM format)."""
         return sorted(tasks, key=lambda t: t.time)
 
     def filter_tasks(self, tasks: List[Task], completed: bool = None, pet_name: str = None):
@@ -89,35 +90,15 @@ class Scheduler:
 
         return tasks
 
-    def detect_conflicts(self, tasks: List[Task]):
-         """Detect tasks scheduled at the same time and return warnings."""
-        seen_times = {}
-        warnings = []
-
-        for task in tasks:
-            if task.time in seen_times:
-                existing_task = seen_times[task.time]
-
-                warning = (
-                    f"Conflict: '{existing_task.title}' and '{task.title}' "
-                    f"are both scheduled at {task.time}"
-                )
-                warnings.append(warning)
-            else:
-                seen_times[task.time] = task
-
-        return warnings
-    
     def handle_recurring_tasks(self, tasks: List[Task]):
-           """Generate next occurrence for completed recurring tasks."""
-        new_tasks = []
-
+        """Generate next occurrence for completed recurring tasks."""
         from datetime import datetime, timedelta
+
+        new_tasks = []
         today = datetime.now()
 
         for task in tasks:
             if task.completed and task.frequency:
-
                 if task.frequency == "daily":
                     next_date = today + timedelta(days=1)
                 elif task.frequency == "weekly":
@@ -137,3 +118,24 @@ class Scheduler:
                 new_tasks.append(new_task)
 
         return new_tasks
+
+    def detect_conflicts(self, tasks: List[Task]):
+        """Detect tasks scheduled at the same time and return warning messages."""
+        seen_times = {}
+        warnings = []
+
+        for task in tasks:
+            if task.time in seen_times:
+                existing_task = seen_times[task.time]
+
+                warning = (
+                    f"Conflict: '{existing_task.title}' and '{task.title}' "
+                    f"are both scheduled at {task.time}"
+                )
+                warnings.append(warning)
+            else:
+                seen_times[task.time] = task
+
+        return warnings
+
+
