@@ -9,10 +9,11 @@ def main():
     dog = Pet("Max", "dog")
     cat = Pet("Kitty", "cat")
 
-    # Add tasks (different times + priorities)
+    # 🔹 Add tasks (OUT OF ORDER now)
     dog.add_task(Task("Morning Walk", 30, "high", "09:00"))
-    dog.add_task(Task("Feed", 10, "high", "08:00"))
-    cat.add_task(Task("Play", 20, "medium", "09:30"))
+    cat.add_task(Task("Play", 20, "medium", "07:30"))  # changed time
+    dog.add_task(Task("Feed", 10, "high", "08:00", frequency="daily"))
+    dog.add_task(Task("Vet Visit", 30, "high", "09:00"))  # same time as walk
 
     # Add pets to owner
     owner.add_pet(dog)
@@ -21,22 +22,27 @@ def main():
     # Create scheduler
     scheduler = Scheduler(owner)
 
-    # Generate plan
+    # Generate plan (this now uses sorting + filtering)
     plan = scheduler.generate_daily_plan()
 
-    # Print schedule nicely
-    print("\nToday's Schedule:\n" + "-" * 30)
-
+    # 🔹 Print sorted schedule
+    print("\nSorted Schedule:\n" + "-" * 30)
     for task in plan:
         print(f"{task.time} | {task.title} | Priority: {task.priority.capitalize()}")
+
+    # 🔹 Test filtering (incomplete tasks)
+    print("\nFiltered (incomplete only):")
+    filtered = scheduler.filter_tasks(owner.get_all_tasks(), completed=False)
+    for task in filtered:
+        print(task.title)
 
     # Check conflicts
     conflicts = scheduler.detect_conflicts(plan)
 
     if conflicts:
         print("\n⚠️ Conflicts detected:")
-        for t1, t2 in conflicts:
-            print(f"- {t1.title} and {t2.title} at {t1.time}")
+        for warning in conflicts:
+            print(f"- {warning}")
     else:
         print("\nNo conflicts detected.")
 

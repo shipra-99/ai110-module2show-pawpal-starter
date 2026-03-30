@@ -1,6 +1,8 @@
 import streamlit as st
+from pawpal_system import Owner, Pet, Task, Scheduler
 
 st.set_page_config(page_title="PawPal+", page_icon="🐾", layout="centered")
+
 
 st.title("🐾 PawPal+")
 
@@ -43,11 +45,23 @@ owner_name = st.text_input("Owner name", value="Jordan")
 pet_name = st.text_input("Pet name", value="Mochi")
 species = st.selectbox("Species", ["dog", "cat", "other"])
 
+if st.button("Add / Update Pet"):
+    st.session_state.pet_obj = Pet(pet_name, species)
+    st.session_state.owner_obj.pets = []  # reset pets
+    st.session_state.owner_obj.add_pet(st.session_state.pet_obj)
+
+    st.success("Pet updated!")
+
 st.markdown("### Tasks")
 st.caption("Add a few tasks. In your final version, these should feed into your scheduler.")
 
-if "tasks" not in st.session_state:
-    st.session_state.tasks = []
+if "owner_obj" not in st.session_state:
+    st.session_state.owner_obj = Owner(owner_name)
+
+if "pet_obj" not in st.session_state:
+    st.session_state.pet_obj = Pet(pet_name, species)
+    st.session_state.owner_obj.add_pet(st.session_state.pet_obj)
+
 
 col1, col2, col3 = st.columns(3)
 with col1:
@@ -58,13 +72,15 @@ with col3:
     priority = st.selectbox("Priority", ["low", "medium", "high"], index=2)
 
 if st.button("Add task"):
-    st.session_state.tasks.append(
-        {"title": task_title, "duration_minutes": int(duration), "priority": priority}
-    )
+    task = Task(task_title, int(duration), priority, "09:00")  # temporary time
+    st.session_state.pet_obj.add_task(task)
 
-if st.session_state.tasks:
+tasks = st.session_state.pet_obj.get_tasks()
+
+if tasks:
     st.write("Current tasks:")
-    st.table(st.session_state.tasks)
+    for t in tasks:
+        st.write(f"{t.title} | {t.priority}")
 else:
     st.info("No tasks yet. Add one above.")
 
@@ -74,9 +90,21 @@ st.subheader("Build Schedule")
 st.caption("This button should call your scheduling logic once you implement it.")
 
 if st.button("Generate schedule"):
-    st.warning(
-        "Not implemented yet. Next step: create your scheduling logic (classes/functions) and call it here."
-    )
+    scheduler = Scheduler(st.session_state.owner_obj)
+    plan = scheduler.generate_daily_plan()
+    conflicts = scheduler.detect_conflicts(plan)
+
+    st.markdown("### Today's Schedule")
+
+    for t in plan:
+        st.write(f"{t.time} | {t.title} | {t.priority}")
+
+    if conflicts:
+        st.warning("⚠️ Conflicts detected:")
+        for t1, t2 in conflicts:
+            st.write(f"{t1.title} and {t2.title} at {t1.time}")
+    else:
+        st.success("No conflicts detected!")
     st.markdown(
         """
 Suggested approach:

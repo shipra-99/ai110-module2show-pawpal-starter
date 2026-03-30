@@ -1,8 +1,11 @@
 from dataclasses import dataclass, field
 from typing import List
+from datetime import datetime, timedelta
 
 
 # ---------------- TASK ----------------
+from datetime import datetime
+
 @dataclass
 class Task:
     title: str
@@ -10,6 +13,7 @@ class Task:
     priority: str
     time: str
     completed: bool = False
+    frequency: str = None   # "daily", "weekly", or None
 
     def mark_complete(self):
         """Mark the task as completed."""
@@ -54,30 +58,82 @@ class Owner:
 class Scheduler:
     def __init__(self, owner: Owner):
         self.owner = owner
-
     def generate_daily_plan(self):
-        """Generate a sorted daily plan of tasks."""
         tasks = self.owner.get_all_tasks()
-        return self.sort_tasks(tasks)
 
-    def sort_tasks(self, tasks: List[Task]):
-        """Sort tasks by priority and time."""
-        priority_map = {"high": 1, "medium": 2, "low": 3}
+        # handle recurrence
+        new_tasks = self.handle_recurring_tasks(tasks)
 
-        return sorted(
-            tasks,
-            key=lambda t: (priority_map.get(t.priority, 4), t.time)
-        )
+        # combine original + new tasks (temporary, not stored)
+        tasks = tasks + new_tasks
+
+        # filter incomplete
+        tasks = self.filter_tasks(tasks, completed=False)
+
+        # sort
+        tasks = self.sort_by_time(tasks)
+
+        return tasks
+
+    def sort_by_time(self, tasks: List[Task]):
+        """Sort tasks by time in HH:MM format."""
+        return sorted(tasks, key=lambda t: t.time)
+
+    def filter_tasks(self, tasks: List[Task], completed: bool = None, pet_name: str = None):
+        """Filter tasks by completion status or pet name."""
+        if completed is not None:
+            tasks = [t for t in tasks if t.completed == completed]
+
+        if pet_name is not None:
+            tasks = [t for t in tasks if pet_name.lower() in t.title.lower()]
+
+        return tasks
 
     def detect_conflicts(self, tasks: List[Task]):
-        """Detect tasks scheduled at the same time."""
+         """Detect tasks scheduled at the same time and return warnings."""
         seen_times = {}
-        conflicts = []
+        warnings = []
 
         for task in tasks:
             if task.time in seen_times:
-                conflicts.append((seen_times[task.time], task))
+                existing_task = seen_times[task.time]
+
+                warning = (
+                    f"Conflict: '{existing_task.title}' and '{task.title}' "
+                    f"are both scheduled at {task.time}"
+                )
+                warnings.append(warning)
             else:
                 seen_times[task.time] = task
 
-        return conflicts
+        return warnings
+    
+    def handle_recurring_tasks(self, tasks: List[Task]):
+           """Generate next occurrence for completed recurring tasks."""
+        new_tasks = []
+
+        from datetime import datetime, timedelta
+        today = datetime.now()
+
+        for task in tasks:
+            if task.completed and task.frequency:
+
+                if task.frequency == "daily":
+                    next_date = today + timedelta(days=1)
+                elif task.frequency == "weekly":
+                    next_date = today + timedelta(days=7)
+                else:
+                    continue
+
+                new_task = Task(
+                    title=task.title,
+                    duration=task.duration,
+                    priority=task.priority,
+                    time=task.time,
+                    completed=False,
+                    frequency=task.frequency
+                )
+
+                new_tasks.append(new_task)
+
+        return new_tasks

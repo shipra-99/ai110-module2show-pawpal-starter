@@ -40,8 +40,13 @@ No major structural changes were needed, but this review helped validate that th
 
 **b. Tradeoffs**
 
-- Describe one tradeoff your scheduler makes.
-- Why is that tradeoff reasonable for this scenario?
+**b. Tradeoffs**
+
+One tradeoff in my scheduler design is that conflict detection only checks for tasks scheduled at the exact same time, rather than detecting overlapping durations. For example, if one task is from 09:00–09:30 and another starts at 09:15, this overlap would not be detected.
+
+This approach was chosen to keep the algorithm simple and efficient (O(n) time complexity using a dictionary). While more advanced overlap detection could be implemented, it would increase complexity and reduce readability.
+
+Additionally, I chose a more readable implementation for conflict detection instead of a more compact “Pythonic” version suggested by AI. While the alternative used advanced constructs like defaultdict and list comprehensions, I prioritized clarity and maintainability for this project.
 
 ---
 
