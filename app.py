@@ -45,9 +45,16 @@ owner_name = st.text_input("Owner name", value="Jordan")
 pet_name = st.text_input("Pet name", value="Mochi")
 species = st.selectbox("Species", ["dog", "cat", "other"])
 
+if "owner_obj" not in st.session_state:
+    st.session_state.owner_obj = Owner(owner_name)
+
+if "pet_obj" not in st.session_state:
+    st.session_state.pet_obj = Pet(pet_name, species)
+    st.session_state.owner_obj.add_pet(st.session_state.pet_obj)
+
 if st.button("Add / Update Pet"):
     st.session_state.pet_obj = Pet(pet_name, species)
-    st.session_state.owner_obj.pets = []  # reset pets
+    st.session_state.owner_obj.pets.clear()
     st.session_state.owner_obj.add_pet(st.session_state.pet_obj)
 
     st.success("Pet updated!")
@@ -55,12 +62,6 @@ if st.button("Add / Update Pet"):
 st.markdown("### Tasks")
 st.caption("Add a few tasks. In your final version, these should feed into your scheduler.")
 
-if "owner_obj" not in st.session_state:
-    st.session_state.owner_obj = Owner(owner_name)
-
-if "pet_obj" not in st.session_state:
-    st.session_state.pet_obj = Pet(pet_name, species)
-    st.session_state.owner_obj.add_pet(st.session_state.pet_obj)
 
 
 col1, col2, col3 = st.columns(3)
@@ -80,9 +81,9 @@ tasks = st.session_state.pet_obj.get_tasks()
 if tasks:
     st.write("Current tasks:")
     for t in tasks:
-        st.write(f"{t.title} | {t.priority}")
+        st.write(f"{t.title} | Priority: {t.priority.capitalize()}")
 else:
-    st.info("No tasks yet. Add one above.")
+    st.info("No tasks yet. Add tasks to generate a schedule.")
 
 st.divider()
 
@@ -91,26 +92,32 @@ st.caption("This button should call your scheduling logic once you implement it.
 
 if st.button("Generate schedule"):
     scheduler = Scheduler(st.session_state.owner_obj)
+
     plan = scheduler.generate_daily_plan()
     conflicts = scheduler.detect_conflicts(plan)
 
-    st.markdown("### Today's Schedule")
+    st.markdown("### 📅 Today's Schedule")
 
-    for t in plan:
-        st.write(f"{t.time} | {t.title} | {t.priority}")
+    if plan:
+        # clean table view
+        table_data = [
+            {
+                "Time": t.time,
+                "Task": t.title,
+                "Priority": t.priority.capitalize()
+            }
+            for t in plan
+        ]
 
+        st.table(table_data)
+        st.success("Schedule generated successfully!")
+    else:
+        st.info("No tasks to schedule.")
+
+    # 🔥 Conflict display (important)
     if conflicts:
-        st.warning("⚠️ Conflicts detected:")
-        for t1, t2 in conflicts:
-            st.write(f"{t1.title} and {t2.title} at {t1.time}")
+        st.warning("⚠️ Scheduling Conflicts Detected")
+        for warning in conflicts:
+            st.write(f"- {warning}")
     else:
         st.success("No conflicts detected!")
-    st.markdown(
-        """
-Suggested approach:
-1. Design your UML (draft).
-2. Create class stubs (no logic).
-3. Implement scheduling behavior.
-4. Connect your scheduler here and display results.
-"""
-    )

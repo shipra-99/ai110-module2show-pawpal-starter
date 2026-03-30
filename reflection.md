@@ -54,13 +54,18 @@ Additionally, I chose a more readable implementation for conflict detection inst
 
 **a. How you used AI**
 
-- How did you use AI tools during this project (for example: design brainstorming, debugging, refactoring)?
-- What kinds of prompts or questions were most helpful?
+I used AI tools like Copilot for multiple parts of the project, including initial design brainstorming, generating class skeletons, implementing scheduling logic, and debugging errors. It was especially helpful for quickly drafting methods like sorting tasks using `sorted()` and understanding how to structure interactions between classes like Owner, Pet, and Scheduler.
+
+The most helpful prompts were specific and task-focused, such as asking how the Scheduler should retrieve tasks from the Owner, or how to implement filtering and conflict detection efficiently. Breaking the work into phases and asking targeted questions helped me get better and more relevant responses.
+
+---
 
 **b. Judgment and verification**
 
-- Describe one moment where you did not accept an AI suggestion as-is.
-- How did you evaluate or verify what the AI suggested?
+One instance where I did not accept an AI suggestion as-is was in the conflict detection logic. Copilot suggested a more compact implementation using advanced Python features like `defaultdict` and list comprehensions. While it worked, I found it less readable and harder to understand.
+
+I evaluated the suggestion by comparing it with my simpler dictionary-based approach and decided to keep my version because it was clearer and easier to maintain. I also verified correctness by testing it through both the CLI demo (`main.py`) and automated tests using pytest.
+
 
 ---
 
@@ -68,13 +73,17 @@ Additionally, I chose a more readable implementation for conflict detection inst
 
 **a. What you tested**
 
-- What behaviors did you test?
-- Why were these tests important?
+I tested core behaviors of the system, including task completion, task addition, sorting by time, filtering out completed tasks, recurring task generation, and conflict detection. I also included edge cases such as having no tasks and having multiple tasks at the same time.
+
+These tests were important to ensure that the scheduler behaves correctly under both normal and edge conditions, and that the algorithmic logic (sorting, filtering, recurrence) works as expected.
+
 
 **b. Confidence**
 
-- How confident are you that your scheduler works correctly?
-- What edge cases would you test next if you had more time?
+I am confident in the correctness of my scheduler (around 4 out of 5). The core features work reliably and are covered by automated tests. The system correctly handles sorting, filtering, recurrence, and conflict detection.
+
+If I had more time, I would test more complex edge cases such as overlapping task durations (not just exact time matches), multiple pets with many tasks, and more advanced recurrence scenarios involving actual dates instead of simple repetition.
+
 
 ---
 
@@ -82,12 +91,13 @@ Additionally, I chose a more readable implementation for conflict detection inst
 
 **a. What went well**
 
-- What part of this project are you most satisfied with?
+The part I am most satisfied with is the Scheduler design. It cleanly separates logic for sorting, filtering, recurrence, and conflict detection, making the system modular and easy to extend. I was also able to successfully integrate backend logic with the Streamlit UI, which made the application feel complete.
 
 **b. What you would improve**
 
-- If you had another iteration, what would you improve or redesign?
+If I had another iteration, I would improve how time and scheduling are handled by using proper datetime objects instead of strings. I would also redesign the Task class to directly associate tasks with specific pets instead of relying on indirect filtering, and enhance the UI to allow users to input task times and frequencies more flexibly.
+
 
 **c. Key takeaway**
 
-- What is one important thing you learned about designing systems or working with AI on this project?
+One key takeaway from this project is that even when using powerful AI tools, the developer still needs to act as the system architect. AI can generate useful code and ideas, but it is important to evaluate those suggestions critically and prioritize clarity, correctness, and maintainability. The best results came from treating AI as a collaborator rather than relying on it blindly.

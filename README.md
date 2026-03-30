@@ -77,41 +77,13 @@ Confidence Level ⭐⭐⭐⭐☆ (4/5)
 The system performs reliably across all tested scenarios, including edge cases like empty task lists and scheduling conflicts. While the implementation is intentionally simple (e.g., conflict detection only checks exact time matches), it is stable and meets all project requirements.
 
 
-## System Design (UML)
+## Features
 
-```mermaid
-classDiagram
+PawPal+ includes several intelligent scheduling features:
 
-class Owner {
-  +String name
-  +List~Pet~ pets
-  +add_pet(pet)
-  +get_all_tasks()
-}
-
-class Pet {
-  +String name
-  +String species
-  +List~Task~ tasks
-  +add_task(task)
-  +get_tasks()
-}
-
-class Task {
-  +String title
-  +int duration
-  +String priority
-  +String time
-  +bool completed
-  +mark_complete()
-}
-
-class Scheduler {
-  +generate_daily_plan(owner)
-  +sort_tasks(tasks)
-  +detect_conflicts(tasks)
-}
-
-Owner "1" --> "*" Pet
-Pet "1" --> "*" Task
-Scheduler --> Owner
+- **Task Management:** Add and track pet care tasks such as feeding, walking, and playtime.
+- **Sorting by Time:** Tasks are automatically sorted in chronological order to create a clear daily plan.
+- **Filtering:** Completed tasks are excluded from the active schedule to keep the plan focused.
+- **Recurring Tasks:** Daily and weekly tasks automatically generate their next occurrence when completed.
+- **Conflict Detection:** The system detects tasks scheduled at the same time and displays user-friendly warnings.
+- **Multi-Pet Support:** Manage tasks across multiple pets through a centralized owner model.
